@@ -59,6 +59,7 @@ class Item : public Module {
 		Drawing::UITab* settingsTab;
 		static unsigned int filterLevelSetting;
 		static unsigned int pingLevelSetting;
+		static unsigned int socketProtectToggle;
 	public:
 
 		Item() : Module("Item") {};
@@ -84,6 +85,8 @@ class Item : public Module {
 
 		static UnitAny* GetViewUnit();
 
+		static void ShowSocketProtectInfo();
+
 		static unsigned int GetFilterLevel() { return filterLevelSetting; }
 		static unsigned int GetPingLevel() { return pingLevelSetting; }
 
@@ -96,6 +99,11 @@ void GetItemPropertyString_Interception();
 void ViewInventoryPatch1_ASM();
 void ViewInventoryPatch2_ASM();
 void ViewInventoryPatch3_ASM();
+
+void SocketProtectPatch_ASM();
+void SocketProtectPatch1_ASM();
+void SocketProtectPatch2_ASM();
+
 struct UnitItemInfo;
 int CreateUnitItemInfo(UnitItemInfo *uInfo, UnitAny *item);
 

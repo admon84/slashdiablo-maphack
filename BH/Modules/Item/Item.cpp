@@ -59,6 +59,8 @@ RunesTxt* GetRunewordTxtById(int rwId);
 map<std::string, Toggle> Item::Toggles;
 unsigned int Item::filterLevelSetting = 0;
 unsigned int Item::pingLevelSetting = 0;
+unsigned int Item::socketProtectToggle = 0;
+
 UnitAny* Item::viewingUnit;
 
 Patch* itemNamePatch = new Patch(Call, D2CLIENT, { 0x92366, 0x96736 }, (int)ItemName_Interception, 6);
@@ -68,6 +70,9 @@ Patch* itemPropertyStringPatch = new Patch(Call, D2CLIENT, { 0x55D9D, 0x2E06D },
 Patch* viewInvPatch1 = new Patch(Call, D2CLIENT, { 0x953E2, 0x997B2 }, (int)ViewInventoryPatch1_ASM, 6);
 Patch* viewInvPatch2 = new Patch(Call, D2CLIENT, { 0x94AB4, 0x98E84 }, (int)ViewInventoryPatch2_ASM, 6);
 Patch* viewInvPatch3 = new Patch(Call, D2CLIENT, { 0x93A6F, 0x97E3F }, (int)ViewInventoryPatch3_ASM, 5);
+
+Patch* socketProtectPatch1 = new Patch(Call, D2CLIENT, { 0x99174, 0x0 }, (int)SocketProtectPatch1_ASM, 6);
+Patch* socketProtectPatch2 = new Patch(Call, D2CLIENT, { 0x96FAB, 0x0 }, (int)SocketProtectPatch2_ASM, 6);
 
 using namespace Drawing;
 
@@ -81,6 +86,10 @@ void Item::OnLoad() {
 	itemPropertiesPatch->Install();
 	itemPropertyStringDamagePatch->Install();
 	itemPropertyStringPatch->Install();
+
+	socketProtectPatch1->Install();
+	socketProtectPatch2->Install();
+
 
 	if (Toggles["Show Ethereal"].state || Toggles["Show Sockets"].state || Toggles["Show iLvl"].state || Toggles["Color Mod"].state ||
 		Toggles["Show Rune Numbers"].state || Toggles["Alt Item Style"].state || Toggles["Shorten Item Names"].state || Toggles["Advanced Item Display"].state)
@@ -119,6 +128,7 @@ void Item::LoadConfig() {
 	BH::config->ReadToggle("Allow Unknown Items", "None", false, Toggles["Allow Unknown Items"]);
 	BH::config->ReadToggle("Suppress Invalid Stats", "None", false, Toggles["Suppress Invalid Stats"]);
 	BH::config->ReadToggle("Always Show Item Stat Ranges", "None", true, Toggles["Always Show Item Stat Ranges"]);
+	BH::config->ReadToggle("Socket Protection", "None", true, Toggles["Socket Protection"]);
 	BH::config->ReadInt("Filter Level", filterLevelSetting);
 	BH::config->ReadInt("Ping Level", pingLevelSetting);
 
@@ -140,6 +150,10 @@ void Item::DrawSettings() {
 
 	new Checkhook(settingsTab, 4, y, &Toggles["Show Sockets"].state, "Show Sockets");
 	new Keyhook(settingsTab, keyhook_x, y+2, &Toggles["Show Sockets"].toggle, "");
+	y += 15;
+
+	new Checkhook(settingsTab, 4, y, &Toggles["Socket Protection"].state, "Socket Protection");
+	new Keyhook(settingsTab, keyhook_x, y + 2, &Toggles["Socket Protection"].toggle, "");
 	y += 15;
 
 	new Checkhook(settingsTab, 4, y, &Toggles["Show iLvl"].state, "Show iLvl");
@@ -229,6 +243,7 @@ void Item::OnUnload() {
 void Item::OnLoop() {
 	static unsigned int localFilterLevel = 0;
 	static unsigned int localPingLevel = 0;
+	Item::socketProtectToggle = Toggles["Socket Protection"].state ? 1 : 0;
 	// This is a bit of a hack to reset the cache when the user changes the item filter level
 	if (localFilterLevel != filterLevelSetting) {
 		ResetCaches();
@@ -1275,5 +1290,53 @@ void __declspec(naked) ViewInventoryPatch3_ASM()
 		mov ecx, dword ptr [edi + 0x60];
 
 		ret;
+	}
+}
+
+void Item::ShowSocketProtectInfo() {
+	PrintText(White, "Socket Protection is on. Toggle it off in settings to socket the item.");
+}
+
+void __declspec(naked) SocketProtectPatch_ASM()
+{
+	__asm {
+		mov eax, p_D2CLIENT_PlayerUnit
+		mov eax, [eax]
+		push 0x13
+		push eax
+		call D2CLIENT_ItemProtect
+		call Item::ShowSocketProtectInfo
+		ret
+	}
+}
+
+void __declspec(naked) SocketProtectPatch1_ASM()
+{
+	__asm {
+		cmp[Item::socketProtectToggle], 0
+		jz outcode
+		call SocketProtectPatch_ASM
+		add dword ptr[esp], 0x47
+		ret
+		outcode :
+		// original code
+		mov eax, [esp + 4 + 0x18]
+			test eax, eax
+			ret
+	}
+}
+
+void __declspec(naked) SocketProtectPatch2_ASM()
+{
+	__asm {
+		cmp[Item::socketProtectToggle], 0
+		jz outcode
+		call SocketProtectPatch_ASM
+		add dword ptr[esp], 0x36
+		ret
+		outcode :
+		mov eax, [esp + 4 + 0x44] // 4 bytes for return address
+			test eax, eax
+			ret
 	}
 }
