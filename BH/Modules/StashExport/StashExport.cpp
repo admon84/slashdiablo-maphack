@@ -238,8 +238,7 @@ void StashExport::GetItemInfo(UnitAny* pItem, JSONObject* pBuffer){
 		txt->szCode[0],
 		txt->szCode[1],
 		txt->szCode[2],
-		txt->szCode[3],
-		0
+		txt->szCode[3]
 	};
 	std::string code = cCode;
 	code = Trim(code);

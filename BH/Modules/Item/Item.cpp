@@ -293,7 +293,17 @@ void Item::OnLeftClick(bool up, int x, int y, bool* block) {
 
 int CreateUnitItemInfo(UnitItemInfo *uInfo, UnitAny *item) {
 	char* code = D2COMMON_GetItemText(item->dwTxtFileNo)->szCode;
-	uInfo->itemCode[0] = code[0]; uInfo->itemCode[1] = code[1]; uInfo->itemCode[2] = code[2]; uInfo->itemCode[3] = 0;
+	uInfo->itemCode[0] = code[0];
+	uInfo->itemCode[1] = code[1];
+	uInfo->itemCode[2] = code[2];
+	uInfo->itemCode[3] = code[3];
+
+	if (!isalnum(uInfo->itemCode[3])) {
+		uInfo->itemCode[3] = 0;
+	} else {
+		uInfo->itemCode[4] = 0;
+	}
+
 	uInfo->item = item;
 	if (ItemAttributeMap.find(uInfo->itemCode) != ItemAttributeMap.end()) {
 		uInfo->attrs = ItemAttributeMap[uInfo->itemCode];

@@ -45,14 +45,14 @@ struct ItemProperty {
 // Collection of item data from the internal UnitAny structure
 struct UnitItemInfo {
 	UnitAny *item;
-	char itemCode[4];
+	char itemCode[5];
 	ItemAttributes *attrs;
 };
 
 // Item data obtained from an incoming 0x9c packet
 struct ItemInfo {
 	ItemAttributes *attrs;
-	char code[4];
+	char code[5];
 	//std::string packet;
 	std::string name;
 	std::string earName;
@@ -220,11 +220,18 @@ public:
 		targetCode[0] = code[0];
 		targetCode[1] = code[1];
 		targetCode[2] = code[2];
-		targetCode[3] = 0;
+		targetCode[3] = code[3];
+
+		if (!isalnum(targetCode[3])) {
+			targetCode[3] = 0;
+		} else {
+			targetCode[4] = 0;
+		}
+
 		conditionType = CT_Operand;
 	};
 private:
-	char targetCode[4];
+	char targetCode[5];
 	bool EvaluateInternal(UnitItemInfo *uInfo, Condition *arg1, Condition *arg2);
 	bool EvaluateInternalFromPacket(ItemInfo *info, Condition *arg1, Condition *arg2);
 };

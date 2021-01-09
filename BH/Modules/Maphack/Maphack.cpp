@@ -368,7 +368,14 @@ void Maphack::OnDraw() {
 				uInfo.itemCode[0] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[0];
 				uInfo.itemCode[1] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[1];
 				uInfo.itemCode[2] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[2];
-				uInfo.itemCode[3] = 0;
+				uInfo.itemCode[3] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[3];
+
+				if (!isalnum(uInfo.itemCode[3])) {
+					uInfo.itemCode[3] = 0;
+				} else {
+					uInfo.itemCode[4] = 0;
+				}
+
 				if (ItemAttributeMap.find(uInfo.itemCode) != ItemAttributeMap.end()) {
 					uInfo.attrs = ItemAttributeMap[uInfo.itemCode];
 					vector<Action> actions = map_action_cache.Get(&uInfo);
@@ -559,7 +566,14 @@ void Maphack::OnAutomapDraw() {
 					uInfo.itemCode[0] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[0];
 					uInfo.itemCode[1] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[1];
 					uInfo.itemCode[2] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[2];
-					uInfo.itemCode[3] = 0;
+					uInfo.itemCode[3] = D2COMMON_GetItemText(unit->dwTxtFileNo)->szCode[3];
+
+					if (!isalnum(uInfo.itemCode[3])) {
+						uInfo.itemCode[3] = 0;
+					} else {
+						uInfo.itemCode[4] = 0;
+					}
+
 					if (ItemAttributeMap.find(uInfo.itemCode) != ItemAttributeMap.end()) {
 						uInfo.attrs = ItemAttributeMap[uInfo.itemCode];
 						const vector<Action> actions = map_action_cache.Get(&uInfo);
@@ -694,8 +708,13 @@ void Maphack::OnGamePacketRecv(BYTE *packet, bool *block) {
                         break;
         }
 
-        memcpy(code, &icode, 4);
-        if(code[3] == ' ') code[3] = '\0';
+        memcpy(code, &icode, 5);
+
+		if (!isalnum(code[3])) {
+			code[3] = '\0';
+		} else {
+			code[4] = '\0';
+		}
 
         //PrintText(1, "%s", code);
 

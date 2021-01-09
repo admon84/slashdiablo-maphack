@@ -273,9 +273,11 @@ void GetItemName(UnitItemInfo *uInfo, string &name) {
 }
 
 void SubstituteNameVariables(UnitItemInfo *uInfo, string &name, const string &action_name) {
-	char origName[128], sockets[4], code[4], ilvl[4], alvl[4], craft_alvl[4], runename[16] = "", runenum[4] = "0";
-	char gemtype[16] = "", gemlevel[16] = "", sellValue[16] = "", statVal[16] = "";
-	char lvlreq[4], wpnspd[4], rangeadder[4];
+	char origName[128], sockets[4], code[8], ilvl[4], alvl[4], craft_alvl[4];
+	char lvlreq[4], wpnspd[4], rangeadder[4], quantity[16];
+	char runename[16] = "", runenum[4] = "0";
+	char gemtype[16] = "", gemlevel[16] = "";
+	char sellValue[16] = "", statVal[16] = "";
 
 	UnitAny *item = uInfo->item;
 	ItemText *txt = D2COMMON_GetItemText(item->dwTxtFileNo);
@@ -283,11 +285,16 @@ void SubstituteNameVariables(UnitItemInfo *uInfo, string &name, const string &ac
 	code[0] = szCode[0];
 	code[1] = szCode[1];
 	code[2] = szCode[2];
-	code[3] = '\0';
+	code[3] = isalnum(code[3]) ? szCode[3] : '\0';
+	if (code[3] != '\0') {
+		code[4] = '\0';
+	}
+
 	auto ilvl_int = item->pItemData->dwItemLevel;
 	auto alvl_int = GetAffixLevel((BYTE)item->pItemData->dwItemLevel, (BYTE)uInfo->attrs->qualityLevel, uInfo->attrs->magicLevel);
-	auto clvl_int = D2COMMON_GetUnitStat(D2CLIENT_GetPlayerUnit(), STAT_LEVEL, 0); 
+	auto clvl_int = D2COMMON_GetUnitStat(D2CLIENT_GetPlayerUnit(), STAT_LEVEL, 0);
 	sprintf_s(sockets, "%d", D2COMMON_GetUnitStat(item, STAT_SOCKETS, 0));
+	sprintf_s(quantity, "%d", D2COMMON_GetUnitStat(item, STAT_AMMOQUANTITY, 0));
 	sprintf_s(ilvl, "%d", ilvl_int);
 	sprintf_s(alvl, "%d", alvl_int);
 	sprintf_s(craft_alvl, "%d", GetAffixLevel((BYTE)(ilvl_int/2+clvl_int/2), (BYTE)uInfo->attrs->qualityLevel, uInfo->attrs->magicLevel));
@@ -309,6 +316,7 @@ void SubstituteNameVariables(UnitItemInfo *uInfo, string &name, const string &ac
 		sprintf_s(gemlevel, "%s", GetGemLevelString(GetGemLevel(uInfo->attrs)));
 		sprintf_s(gemtype, "%s", GetGemTypeString(GetGemType(uInfo->attrs)));
 	}
+
 	ActionReplace replacements[] = {
 		{"NAME", origName},
 		{"SOCKETS", sockets},
@@ -323,8 +331,9 @@ void SubstituteNameVariables(UnitItemInfo *uInfo, string &name, const string &ac
 		{"WPNSPD", wpnspd},
 		{"RANGE", rangeadder},
 		{"CODE", code},
-		{"NL", "\n"},
 		{"PRICE", sellValue},
+		{"QTY", quantity},
+		{"NL", "\n"},
 		COLOR_REPLACEMENTS
 	};
 	name.assign(action_name);
@@ -577,10 +586,10 @@ void BuildAction(string *str, Action *act) {
 	}
 
 	// new stuff:
-	act->borderColor = ParseMapColor(act, "BORDER");
-	act->colorOnMap = ParseMapColor(act, "MAP");
-	act->dotColor = ParseMapColor(act, "DOT");
-	act->pxColor = ParseMapColor(act, "PX");
+	act->borderColor = ParseMapColor(act, "BORDER");	// Large map icon
+	act->colorOnMap = ParseMapColor(act, "MAP");		// Medium map icon
+	act->dotColor = ParseMapColor(act, "DOT");			// Small map icon
+	act->pxColor = ParseMapColor(act, "PX");			// Tiny map icon
 	act->lineColor = ParseMapColor(act, "LINE");
 	act->notifyColor = ParseMapColor(act, "NOTIFY");
 	act->pingLevel = ParsePingLevel(act, "TIER");
@@ -1673,7 +1682,7 @@ void HandleUnknownItemCode(char *code, char *tag) {
 		return;
 	}
 	if (UnknownItemCodes.find(code) == UnknownItemCodes.end()) {
-		PrintText(1, "Unknown item code %s: %c%c%c\n", tag, code[0], code[1], code[2]);
+		PrintText(1, "Unknown item code %s: %s\n", tag, code);
 		UnknownItemCodes[code] = 1;
 	}
 }

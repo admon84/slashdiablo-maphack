@@ -740,7 +740,8 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		if (item->ground) {
 			item->x = reader.read(16);
 			item->y = reader.read(16);
-		} else {
+		}
+		else {
 			item->directory = reader.read(4);
 			item->x = reader.read(4);
 			item->y = reader.read(3);
@@ -757,17 +758,20 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 				item->y += 8;
 			}
 			item->container = static_cast<unsigned int>(container);
-		} else if (item->container == CONTAINER_UNSPECIFIED) {
+		}
+		else if (item->container == CONTAINER_UNSPECIFIED) {
 			if (item->directory == EQUIP_NONE) {
 				if (item->inSocket) {
 					//y is ignored for this container type, x tells you the index
 					item->container = CONTAINER_ITEM;
-				} else if (item->action == ITEM_ACTION_PLACE_BELT || item->action == ITEM_ACTION_REMOVE_BELT) {
+				}
+				else if (item->action == ITEM_ACTION_PLACE_BELT || item->action == ITEM_ACTION_REMOVE_BELT) {
 					item->container = CONTAINER_BELT;
 					item->y = item->x / 4;
 					item->x %= 4;
 				}
-			} else {
+			}
+			else {
 				item->unspecifiedDirectory = true;
 			}
 		}
@@ -797,7 +801,13 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		for (std::size_t i = 0; i < 4; i++) {
 			item->code[i] = static_cast<char>(reader.read(8));
 		}
-		item->code[3] = 0;
+
+		if (!isalnum(item->code[3])) {
+			item->code[3] = 0;
+		}
+		else {
+			item->code[4] = 0;
+		}
 
 		if (ItemAttributeMap.find(item->code) == ItemAttributeMap.end()) {
 			HandleUnknownItemCode(item->code, "from packet");
@@ -815,7 +825,8 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 			bool big_pile = reader.readBool();
 			if (big_pile) {
 				item->amount = reader.read(32);
-			} else {
+			}
+			else {
 				item->amount = reader.read(12);
 			}
 			return;
@@ -841,7 +852,7 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		}
 
 		if (item->identified) {
-			switch(item->quality) {
+			switch (item->quality) {
 			case ITEM_QUALITY_INFERIOR:
 				item->prefix = reader.read(3);
 				break;
@@ -866,9 +877,10 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 				break;
 
 			case ITEM_QUALITY_UNIQUE:
-				if (item->code[0] != 's' || item->code[1] != 't' || item->code[2] != 'd') { //standard of heroes exception?
-					item->uniqueCode = reader.read(12);
+				if (item->code[0] == 's' && item->code[1] == 't' && item->code[2] == 'd') { //standard of heroes exception
+					break;
 				}
+				item->uniqueCode = reader.read(12);
 				break;
 			}
 		}
@@ -909,19 +921,20 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 
 		/*if(entry.throwable)
 		{
-			reader.read(9);
-			reader.read(17);
+		reader.read(9);
+		reader.read(17);
 		} else */
 		//special case: indestructible phase blade
 		if (item->code[0] == '7' && item->code[1] == 'c' && item->code[2] == 'r') {
 			reader.read(8);
-		} else if (item->isArmor || item->isWeapon) {
+		}
+		else if (item->isArmor || item->isWeapon) {
 			item->maxDurability = reader.read(8);
 			item->indestructible = item->maxDurability == 0;
 			/*if (!item->indestructible) {
 				item->durability = reader.read(8);
 				reader.readBool();
-			}*/
+				}*/
 			//D2Hackit always reads it, hmmm. Appears to work.
 			item->durability = reader.read(8);
 			reader.readBool();
@@ -946,6 +959,13 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 			unsigned long set_mods = reader.read(5);
 		}
 
+		
+		if (strcmp(item->code, "dcbl") == 0 || //pd2 pure demonic essence
+			strcmp(item->code, "dcho") == 0 || //pd2 black soulstone
+			strcmp(item->code, "dcso") == 0) { //pd2 prime evil soul
+			return;
+		}
+
 		while (true) {
 			unsigned long stat_id = reader.read(9);
 			if (stat_id == 0x1ff) {
@@ -954,18 +974,18 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 			ItemProperty prop = {};
 			if (!ProcessStat(stat_id, reader, prop) &&
 					!(*BH::MiscToggles2)["Suppress Invalid Stats"].state) {
-				PrintText(1, "Invalid stat: %d, %c%c%c", stat_id, item->code[0], item->code[1], item->code[2]);
+				PrintText(1, "Invalid stat: %d, item: %s, data: %s", stat_id, item->code, data);
 				*success = false;
 				break;
 			}
 			item->properties.push_back(prop);
 		}
 	} catch (int e) {
-		PrintText(1, "Int exception parsing item: %c%c%c, %d", item->code[0], item->code[1], item->code[2], e);
+		PrintText(1, "Int exception parsing item: %s, %d", item->code, e);
 	} catch (std::exception const & ex) {
-		PrintText(1, "Exception parsing item: %c%c%c, %s", item->code[0], item->code[1], item->code[2], ex.what());
+		PrintText(1, "Exception parsing item: %s, %s", item->code, ex.what());
 	} catch(...) {
-		PrintText(1, "Miscellaneous exception parsing item: %c%c%c", item->code[0], item->code[1], item->code[2]);
+		PrintText(1, "Miscellaneous exception parsing item: %s", item->code);
 		*success = false;
 	}
 	return;
