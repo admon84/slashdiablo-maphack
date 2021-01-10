@@ -231,8 +231,8 @@ VOID Gamefilter::CreateGamelist(VOID)
 
 	}
 
-	filterBox = D2WIN_CreateEditBox(599, 185, 145, 41, 7, NULL, NULL, Gamefilter::Filterbox_ReturnHandler, NULL, NULL, (ControlPreferences*)p_D2MULTI_EditboxPreferences);
-	//filterBox->pCellFile = D2CLIENT_LoadUiImage("DATA\\GLOBAL\\UI\\FrontEnd\\textbox2");
+	filterBox = D2WIN_CreateEditBox(649, 198, 145, 41, 7, NULL, NULL, Gamefilter::Filterbox_ReturnHandler, NULL, NULL, (ControlPreferences*)p_D2MULTI_EditboxPreferences);
+	//filterBox->pCellFile = D2WIN_LoadCellFile("DATA\\GLOBAL\\UI\\FrontEnd\\textbox2", 0);
 	D2WIN_SetEditBoxCallback(filterBox, Gamefilter::Filterbox_InputHandler);
 	filterBox->dwMaxLength = 0x12;
 	filterBox->Initialize(filterBox);
@@ -279,8 +279,8 @@ void Gamefilter::OnOOGDraw() {
 		wFilterString += wFilterStream.str().c_str();
 
 		DWORD dwOldSize = D2WIN_SetTextSize(1);
-		D2WIN_DrawText(L"Filter", 549, 170, 4, -1);
-		D2WIN_DrawText(wFilterString.c_str(), 424, 190, 4, -1);
+		D2WIN_DrawText(L"Filter", 599, 190, Gold, -1);
+		D2WIN_DrawText(wFilterString.c_str(), 424, 190, Gold, -1);
 
 		if(*showDiff || *showGs) {
 			D2WIN_SetTextSize(6);

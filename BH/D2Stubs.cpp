@@ -54,17 +54,6 @@ DWORD __declspec(naked) __fastcall D2CLIENT_GetUIVar_STUB(DWORD varno)
 	}
 }
 
-__declspec(naked) CellFile* __fastcall D2CLIENT_LoadUiImage(CHAR* szPath)
-{
-	__asm
-	{
-		MOV EAX, ECX
-		PUSH 0
-		CALL D2CLIENT_LoadUiImage_I
-		RETN
-	}
-}
-
 DWORD __declspec(naked) __fastcall D2CLIENT_ClickParty_ASM(RosterUnit* RosterUnit, DWORD Mode)
 {
 	__asm

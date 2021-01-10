@@ -13,19 +13,19 @@ map<std::string, Toggle> ScreenInfo::Toggles;
 void ScreenInfo::OnLoad() {
 	LoadConfig();
 
-	bhText = new Texthook(OutOfGame, 795, 6, BH_VERSION " (dev/pd2 branch)");
+	bhText = new Texthook(OutOfGame, 798, 3, BH_VERSION " (dev/pd2 branch)");
 	bhText->SetAlignment(Right);
 	bhText->SetColor(Grey);
 
 	/*
-	d2VersionText = new Texthook(OutOfGame, 795, 18, D2Version::GetHumanReadableVersion());
+	d2VersionText = new Texthook(OutOfGame, 798, 15, D2Version::GetHumanReadableVersion());
 	d2VersionText->SetAlignment(Right);
 	d2VersionText->SetColor(White);
 	d2VersionText->SetFont(1);
 	*/
 
 	if (BH::cGuardLoaded) {
-		Texthook* cGuardText = new Texthook(Perm, 790, 23, "ÿc4cGuard Loaded");
+		Texthook* cGuardText = new Texthook(Perm, 798, 20, "ÿc4cGuard Loaded");
 		cGuardText->SetAlignment(Right);
 	}
 	gameTimer = GetTickCount();
