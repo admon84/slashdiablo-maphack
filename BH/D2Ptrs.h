@@ -151,6 +151,8 @@ FUNCPTR(D2CLIENT, CancelTrade, void __fastcall, (void), 0x595C0, 0x11F30)
 
 FUNCPTR(D2CLIENT, GetDifficulty, BYTE __stdcall, (void), 0x41930, 0x42980)
 
+FUNCPTR(D2CLIENT, ItemProtect, void __stdcall, (UnitAny* pUnit, DWORD dwType), 0x23200, 0x0)
+
 FUNCPTR(D2CLIENT, ExitGame, void __fastcall, (void), 0x42850, 0x43870)
 
 FUNCPTR(D2CLIENT, GetUiVar_I, DWORD __fastcall, (DWORD dwVarNo), 0xBE400, 0x17C50)
