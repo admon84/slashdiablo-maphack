@@ -117,24 +117,24 @@ void Item::OnGameJoin() {
 }
 
 void Item::LoadConfig() {
-	BH::config->ReadToggle("Show Ethereal", "None", true, Toggles["Show Ethereal"]);
-	BH::config->ReadToggle("Show Sockets", "None", true, Toggles["Show Sockets"]);
-	BH::config->ReadToggle("Show ILvl", "None", true, Toggles["Show iLvl"]);
-	BH::config->ReadToggle("Show Rune Numbers", "None", true, Toggles["Show Rune Numbers"]);
-	BH::config->ReadToggle("Alt Item Style", "None", true, Toggles["Alt Item Style"]);
+	BH::config->ReadToggle("Show Ethereal", "None", false, Toggles["Show Ethereal"]);
+	BH::config->ReadToggle("Show Sockets", "None", false, Toggles["Show Sockets"]);
+	BH::config->ReadToggle("Show iLvl", "None", false, Toggles["Show iLvl"]);
+	BH::config->ReadToggle("Show Rune Numbers", "None", false, Toggles["Show Rune Numbers"]);
+	BH::config->ReadToggle("Alt Item Style", "None", false, Toggles["Alt Item Style"]);
 	BH::config->ReadToggle("Color Mod", "None", false, Toggles["Color Mod"]);
 	BH::config->ReadToggle("Shorten Item Names", "None", false, Toggles["Shorten Item Names"]);
 	BH::config->ReadToggle("Always Show Items", "None", false, Toggles["Always Show Items"]);
-	BH::config->ReadToggle("Advanced Item Display", "None", false, Toggles["Advanced Item Display"]);
+	BH::config->ReadToggle("Always Show Item Stat Ranges", "None", true, Toggles["Always Show Item Stat Ranges"]);
+	BH::config->ReadToggle("Advanced Item Display", "None", true, Toggles["Advanced Item Display"]);
 	BH::config->ReadToggle("Item Drop Notifications", "None", false, Toggles["Item Drop Notifications"]);
 	BH::config->ReadToggle("Item Close Notifications", "None", false, Toggles["Item Close Notifications"]);
 	BH::config->ReadToggle("Item Detailed Notifications", "None", false, Toggles["Item Detailed Notifications"]);
 	BH::config->ReadToggle("Verbose Notifications", "None", false, Toggles["Verbose Notifications"]);
 	BH::config->ReadToggle("Allow Unknown Items", "None", false, Toggles["Allow Unknown Items"]);
 	BH::config->ReadToggle("Suppress Invalid Stats", "None", false, Toggles["Suppress Invalid Stats"]);
-	BH::config->ReadToggle("Always Show Item Stat Ranges", "None", true, Toggles["Always Show Item Stat Ranges"]);
 	BH::config->ReadInt("Filter Level", filterLevelSetting);
-	BH::config->ReadInt("Ping Level", pingLevelSetting);
+	//BH::config->ReadInt("Ping Level", pingLevelSetting);
 
 	ItemDisplay::UninitializeItemRules();
 
@@ -223,11 +223,11 @@ void Item::DrawSettings() {
 	new Keyhook(settingsTab, keyhook_x, y+2, &Toggles["Verbose Notifications"].toggle, "");
 	y += 15;
 
-	new Checkhook(settingsTab, 4, y, &Toggles["Suppress Invalid Stats"].state, "Suppress Invalid Stats");
-	new Keyhook(settingsTab, keyhook_x, y+2, &Toggles["Suppress Invalid Stats"].toggle, "");
-	y += 15;
+	//new Checkhook(settingsTab, 4, y, &Toggles["Suppress Invalid Stats"].state, "Suppress Invalid Stats");
+	//new Keyhook(settingsTab, keyhook_x, y+2, &Toggles["Suppress Invalid Stats"].toggle, "");
+	//y += 15;
 	
-	new Keyhook(settingsTab, 4, y+2, &showPlayer, "Show Player's Gear:   ");
+	new Keyhook(settingsTab, 4, y+2, &showPlayer, "Show Player's Gear:    ");
 	y += 15;
 
 	new Texthook(settingsTab, 4, y, "Filter Level:");
@@ -239,6 +239,7 @@ void Item::DrawSettings() {
 	options.push_back("3 - Aggressive");
 	new Combohook(settingsTab, 85, y, 120, &filterLevelSetting, options);
 
+	/*
 	new Texthook(settingsTab, 234, y, "Ping Tiers <=:");
 
 	vector<string> ping_options;
@@ -250,6 +251,7 @@ void Item::DrawSettings() {
 	ping_options.push_back("5");
 	ping_options.push_back("6");
 	new Combohook(settingsTab, 330, y, 40, &pingLevelSetting, ping_options);
+	*/
 }
 
 void Item::OnUnload() {

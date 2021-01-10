@@ -972,12 +972,12 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 				break;
 			}
 			ItemProperty prop = {};
-			if (!ProcessStat(stat_id, reader, prop) &&
+			/*if (!ProcessStat(stat_id, reader, prop) &&
 					!(*BH::MiscToggles2)["Suppress Invalid Stats"].state) {
 				PrintText(1, "Invalid stat: %d, item: %s, data: %s", stat_id, item->code, data);
 				*success = false;
 				break;
-			}
+			}*/
 			item->properties.push_back(prop);
 		}
 	} catch (int e) {
