@@ -145,9 +145,9 @@ void Gamefilter::OnRealmPacketRecv(BYTE* pPacket, bool* blockPacket) {
 			(*p_D2MULTI_GameListControl)->pChildControl->dwScrollEntries = (*p_D2MULTI_GameListControl)->dwSelectEnd > 9 ? (*p_D2MULTI_GameListControl)->dwSelectEnd - 9 : 0;
 			filterVector.push_back(pEntry);
 
-			if(::toupper(pEntry->sGameDesc[0]) == 'G' && ::toupper(pEntry->sGameDesc[1]) == 'S')
+			if (::toupper(pEntry->sGameDesc[0]) == 'G' && ::toupper(pEntry->sGameDesc[1]) == 'S' && pEntry->sGameDesc[2] == ' ')
 			{
-				switch (pEntry->sGameDesc[2])
+				switch (pEntry->sGameDesc[3])
 				{
 				case '1':
 					gServerVector.push_back(L"gs1");
@@ -232,7 +232,7 @@ VOID Gamefilter::CreateGamelist(VOID)
 	}
 
 	filterBox = D2WIN_CreateEditBox(599, 185, 145, 41, 7, NULL, NULL, Gamefilter::Filterbox_ReturnHandler, NULL, NULL, (ControlPreferences*)p_D2MULTI_EditboxPreferences);
-	filterBox->pCellFile = D2CLIENT_LoadUiImage("DATA\\GLOBAL\\UI\\FrontEnd\\textbox2");
+	//filterBox->pCellFile = D2CLIENT_LoadUiImage("DATA\\GLOBAL\\UI\\FrontEnd\\textbox2");
 	D2WIN_SetEditBoxCallback(filterBox, Gamefilter::Filterbox_InputHandler);
 	filterBox->dwMaxLength = 0x12;
 	filterBox->Initialize(filterBox);
@@ -379,9 +379,9 @@ void Gamefilter::BuildGameList(string sFilter)
 				(*p_D2MULTI_GameListControl)->pChildControl->dwScrollEntries = (*p_D2MULTI_GameListControl)->dwSelectEnd > 9 ? (*p_D2MULTI_GameListControl)->dwSelectEnd - 9 : 0;
 				filterVector.push_back(*ListEntry);
 
-				if (::toupper((*ListEntry)->sGameDesc[0]) == 'G' && ::toupper((*ListEntry)->sGameDesc[1]) == 'S')
+				if (::toupper((*ListEntry)->sGameDesc[0]) == 'G' && ::toupper((*ListEntry)->sGameDesc[1]) == 'S' && (*ListEntry)->sGameDesc[2] == ' ')
 				{
-					switch ((*ListEntry)->sGameDesc[2])
+					switch ((*ListEntry)->sGameDesc[3])
 					{
 					case '1':
 						gServerVector.push_back(L"gs1");
