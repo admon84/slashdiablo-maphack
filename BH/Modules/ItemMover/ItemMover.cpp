@@ -51,16 +51,16 @@ void ItemMover::Init() {
 
 		INVENTORY_LEFT = ((inventoryLayout->Left - 320) + (*p_D2CLIENT_ScreenSizeX / 2));
 		INVENTORY_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + inventoryLayout->Top;
-		STASH_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + lodStashLayout->Left;
+		STASH_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 262) + lodStashLayout->Left;
 		LOD_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + lodStashLayout->Top;
 		CLASSIC_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + classicStashLayout->Top;
 		CUBE_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + cubeLayout->Left;
 		CUBE_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + cubeLayout->Top;
 	} else {
-		classicStashLayout = InventoryLayoutMap["Bank Page2"];
-		lodStashLayout = InventoryLayoutMap["Big Bank Page2"];
-		inventoryLayout = InventoryLayoutMap["Amazon2"];  // all character types have the same layout
-		cubeLayout = InventoryLayoutMap["Transmogrify Box2"];
+		classicStashLayout = InventoryLayoutMap["Bank Page 2"];
+		lodStashLayout = InventoryLayoutMap["Big Bank Page 2"];
+		inventoryLayout = InventoryLayoutMap["Amazon"];  // all character types have the same layout
+		cubeLayout = InventoryLayoutMap["Transmogrify Box Page 2"];
 
 		INVENTORY_LEFT = inventoryLayout->Left;
 		INVENTORY_TOP = inventoryLayout->Top;
