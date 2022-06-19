@@ -6,7 +6,9 @@
 #include "D2Intercepts.h"
 #include "D2Handlers.h"
 #include "Modules.h"
+#include "MPQReader.h"
 #include "MPQInit.h"
+#include "TableReader.h"
 #include "Task.h"
 
 string BH::path;
@@ -82,7 +84,9 @@ DWORD WINAPI LoadMPQData(VOID* lpvoid){
 		}
 	}
 
+	ReadMPQFiles(patchPath);
 	InitializeMPQData();
+	Tables::initTables();
 
 	return 0;
 }
@@ -90,17 +94,13 @@ DWORD WINAPI LoadMPQData(VOID* lpvoid){
 void BH::Initialize()
 {
 	moduleManager = new ModuleManager();
-	config = new Config("BH_settings.cfg");
+	config = new Config("Settings.cfg"); // Previously BH_settings.cfg
 	if(!config->Parse()) {
-		config->SetConfigName("BH_Default.cfg");
-		if(!config->Parse()) {
-			string msg = "Could not find BH settings.\nAttempted to load " +
-				path + "BH_settings.cfg (failed).\nAttempted to load "+
-				path + "BH_Default.cfg (failed).\n\nDefaults loaded.";
-			MessageBox(NULL, msg.c_str(), "Failed to load BH config", MB_OK);
-		}
+		string msg = "Could not find Settings config file.\nAttempted to load " +
+			path + "Settings.cfg (failed).";
+		MessageBox(NULL, msg.c_str(), "Failed to load Settings config", MB_OK);
 	}
-	itemConfig = new Config("BH.cfg");
+	itemConfig = new Config("loot.filter"); // Previously BH.cfg
 	itemConfig->Parse();
 
 	// Do this asynchronously because D2GFX_GetHwnd() will be null if
@@ -119,7 +119,11 @@ void BH::Initialize()
 	Task::InitializeThreadPool(2);
 
 	// Read the MPQ Data asynchronously
-	
+	//CreateThread(0, 0, LoadMPQData, 0, 0, 0);
+	Task::Enqueue([]() -> void {
+		LoadMPQData(NULL);
+		moduleManager->MpqLoaded();
+	});
 	
 	new ScreenInfo();
 	new Gamefilter();

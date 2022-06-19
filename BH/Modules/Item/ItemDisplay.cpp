@@ -478,14 +478,14 @@ std::string without_invis_chars(const std::string &name) {
 }
 
 namespace ItemDisplay {
+
 	bool item_display_initialized = false;
+
 	void InitializeItemRules() {
 		if (item_display_initialized) return;
 		if (!IsInitialized()){
 			return;
 		}
-
-
 
 		item_display_initialized = true;
 		rules.clear();

@@ -44,6 +44,8 @@
     <ClCompile Include="Patch.cpp" />
     <ClCompile Include="Modules\StashExport\StashExport.cpp" />
     <ClCompile Include="Task.cpp" />
+    <ClCompile Include="MPQReader.cpp" />
+    <ClCompile Include="TableReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsyncDrawBuffer.h" />
@@ -103,5 +105,7 @@
     <ClInclude Include="Patch.h" />
     <ClInclude Include="Modules\StashExport\StashExport.h" />
     <ClInclude Include="Task.h" />
+    <ClInclude Include="MPQReader.h" />
+    <ClInclude Include="TableReader.h" />
   </ItemGroup>
 </Project>

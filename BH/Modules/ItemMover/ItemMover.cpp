@@ -19,15 +19,12 @@ int CUBE_HEIGHT = 4;
 // These are pixel positions
 int INVENTORY_LEFT = 417;
 int INVENTORY_TOP = 315;
-int CLASSIC_STASH_LEFT = 273;
 int STASH_LEFT = 153;
 int LOD_STASH_TOP = 143;
 int CLASSIC_STASH_TOP = 334;
 int CUBE_LEFT = 197;
 int CUBE_TOP = 199;
 int CELL_SIZE = 29;
-
-std::string POTIONS[] = { "hp", "mp", "rv" };
 
 DWORD idBookId;
 DWORD unidItemId;
@@ -36,10 +33,10 @@ void ItemMover::Init() {
 	// We should be able to get the layout from *p_D2CLIENT_StashLayout and friends,
 	// but doesn't seem to be working at the moment so use the mpq data.
 
-	InventoryTxt*classicStashLayout;
-	InventoryTxt*lodStashLayout;
-	InventoryTxt*inventoryLayout;
-	InventoryTxt*cubeLayout;
+	InventoryLayout *classicStashLayout;
+	InventoryLayout *lodStashLayout;
+	InventoryLayout *inventoryLayout;
+	InventoryLayout *cubeLayout;
 
 	// Pull screen sizing info from the mpq data
 	int screenWidth = *p_D2CLIENT_ScreenSizeX;
@@ -47,44 +44,54 @@ void ItemMover::Init() {
 	//PrintText(1, "Got screensize %d, %d", screenWidth, screenHeight);
 
 	if (screenWidth != 800 || screenHeight != 600) {
-		classicStashLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_BANK]; //InventoryLayoutMap["Bank Page 1"];
-		lodStashLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_BIG_BANK]; //InventoryLayoutMap["Big Bank Page 1"];
-		inventoryLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_AMAZON]; //InventoryLayoutMap["Amazon"];  // all character types have the same layout
-		cubeLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_CUBE]; //InventoryLayoutMap["Transmogrify Box Page 1"];
+		classicStashLayout = InventoryLayoutMap["Bank Page 1"];
+		lodStashLayout = InventoryLayoutMap["Big Bank Page 1"];
+		inventoryLayout = InventoryLayoutMap["Amazon"];  // all character types have the same layout
+		cubeLayout = InventoryLayoutMap["Transmogrify Box Page 1"];
 
-		INVENTORY_LEFT = ((inventoryLayout->Grid.dwLeft - 320) + (*p_D2CLIENT_ScreenSizeX / 2));
-		INVENTORY_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + inventoryLayout->Grid.dwTop;
-		CLASSIC_STASH_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + classicStashLayout->Grid.dwLeft;
-		STASH_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + lodStashLayout->Grid.dwLeft;
-		LOD_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + lodStashLayout->Grid.dwTop;
-		CLASSIC_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + classicStashLayout->Grid.dwTop;
-		CUBE_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + cubeLayout->Grid.dwLeft;
-		CUBE_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + cubeLayout->Grid.dwTop;
+		INVENTORY_LEFT = ((inventoryLayout->Left - 320) + (*p_D2CLIENT_ScreenSizeX / 2));
+		INVENTORY_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + inventoryLayout->Top;
+		STASH_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + lodStashLayout->Left;
+		LOD_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + lodStashLayout->Top;
+		CLASSIC_STASH_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + classicStashLayout->Top;
+		CUBE_LEFT = ((*p_D2CLIENT_ScreenSizeX / 2) - 320) + cubeLayout->Left;
+		CUBE_TOP = ((*p_D2CLIENT_ScreenSizeY / 2) - 240) + cubeLayout->Top;
 	} else {
-		classicStashLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_EXP_BANK]; //InventoryLayoutMap["Bank Page2"];
-		lodStashLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_EXP_BIG_BANK];  //InventoryLayoutMap["Big Bank Page2"];
-		inventoryLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_EXP_AMAZON];  //InventoryLayoutMap["Amazon2"];  // all character types have the same layout
-		cubeLayout = &(*p_D2COMMON_InventoryTxt)[INV_REC_EXP_CUBE]; //InventoryLayoutMap["Transmogrify Box2"];
+		classicStashLayout = InventoryLayoutMap["Bank Page2"];
+		lodStashLayout = InventoryLayoutMap["Big Bank Page2"];
+		inventoryLayout = InventoryLayoutMap["Amazon2"];  // all character types have the same layout
+		cubeLayout = InventoryLayoutMap["Transmogrify Box2"];
 
-		INVENTORY_LEFT = inventoryLayout->Grid.dwLeft;
-		INVENTORY_TOP = inventoryLayout->Grid.dwTop;
-		CLASSIC_STASH_LEFT = classicStashLayout->Grid.dwLeft;
-		STASH_LEFT = lodStashLayout->Grid.dwLeft;
-		LOD_STASH_TOP = lodStashLayout->Grid.dwTop;
-		CLASSIC_STASH_TOP = classicStashLayout->Grid.dwTop;
-		CUBE_LEFT = cubeLayout->Grid.dwLeft;
-		CUBE_TOP = cubeLayout->Grid.dwTop;
+		INVENTORY_LEFT = inventoryLayout->Left;
+		INVENTORY_TOP = inventoryLayout->Top;
+		STASH_LEFT = lodStashLayout->Left;
+		LOD_STASH_TOP = lodStashLayout->Top;
+		CLASSIC_STASH_TOP = classicStashLayout->Top;
+		CUBE_LEFT = cubeLayout->Left;
+		CUBE_TOP = cubeLayout->Top;
 	}
 
-	CELL_SIZE = inventoryLayout->Grid.nWidth;
+	CELL_SIZE = inventoryLayout->SlotPixelHeight;
 
-	INVENTORY_WIDTH = inventoryLayout->Inventory.nGridX;
-	INVENTORY_HEIGHT = inventoryLayout->Inventory.nGridY;
-	STASH_WIDTH = lodStashLayout->Inventory.nGridX;
-	LOD_STASH_HEIGHT = lodStashLayout->Inventory.nGridY;
-	CLASSIC_STASH_HEIGHT = classicStashLayout->Inventory.nGridY;
-	CUBE_WIDTH = cubeLayout->Inventory.nGridX;
-	CUBE_HEIGHT = cubeLayout->Inventory.nGridY;
+	INVENTORY_WIDTH = inventoryLayout->SlotWidth;
+	INVENTORY_HEIGHT = inventoryLayout->SlotHeight;
+	STASH_WIDTH = lodStashLayout->SlotWidth;
+	LOD_STASH_HEIGHT = lodStashLayout->SlotHeight;
+	CLASSIC_STASH_HEIGHT = classicStashLayout->SlotHeight;
+	CUBE_WIDTH = cubeLayout->SlotWidth;
+	CUBE_HEIGHT = cubeLayout->SlotHeight;
+
+	// Hard-code dimensions here
+	STASH_WIDTH = 10;
+	LOD_STASH_HEIGHT = 15;
+	INVENTORY_HEIGHT = 8;
+	// screensizeY is 600,  /2 --> 300 ,  -240 --> 60
+	// or should i modify 'lodStashLayout->Top'  (143 pixels from top of screen in lod. verified in screenshot. 315 for inv)
+	//                                            47 pixels from top in PD2
+	LOD_STASH_TOP = 47;
+	INVENTORY_TOP = 250;
+	// pd2 cube has extra column, 4x4
+	CUBE_WIDTH = 4;
 
 	if (!InventoryItemIds) {
 		InventoryItemIds = new int[INVENTORY_WIDTH * INVENTORY_HEIGHT];
@@ -317,19 +324,19 @@ void ItemMover::OnLeftClick(bool up, int x, int y, bool* block) {
 	BnetData* pData = (*p_D2LAUNCH_BnData);
 	UnitAny *unit = D2CLIENT_GetPlayerUnit();
 	bool shiftState = ((GetKeyState(VK_LSHIFT) & 0x80) || (GetKeyState(VK_RSHIFT) & 0x80));
-	
+
 	if (up || !pData || !unit || !shiftState || D2CLIENT_GetCursorItem()>0 || (!D2CLIENT_GetUIState(UI_INVENTORY) && !D2CLIENT_GetUIState(UI_STASH) && !D2CLIENT_GetUIState(UI_CUBE) && !D2CLIENT_GetUIState(UI_NPCSHOP))) {
 		return;
 	}
-	
-	Init();	
+
+	Init();
 
 	unidItemId = 0;
 	idBookId = 0;
-	
+
 	int xpac = pData->nCharFlags & PLAYER_TYPE_EXPANSION;
 
-	int mouseX,mouseY;	
+	int mouseX,mouseY;
 
 	for (UnitAny *pItem = unit->pInventory->pFirstItem; pItem; pItem = pItem->pItemData->pNextInvItem) {
 		char *code = D2COMMON_GetItemText(pItem->dwTxtFileNo)->szCode;
@@ -342,12 +349,11 @@ void ItemMover::OnLeftClick(bool up, int x, int y, bool* block) {
 				mouseX = (*p_D2CLIENT_MouseX - INVENTORY_LEFT) / CELL_SIZE;
 				mouseY = (*p_D2CLIENT_MouseY - INVENTORY_TOP) / CELL_SIZE;
 			} else if(pItem->pItemData->ItemLocation == STORAGE_STASH) {
+				mouseX = (*p_D2CLIENT_MouseX - STASH_LEFT) / CELL_SIZE;
 				if (xpac) {
 					mouseY = (*p_D2CLIENT_MouseY - LOD_STASH_TOP) / CELL_SIZE;
-					mouseX = (*p_D2CLIENT_MouseX - STASH_LEFT) / CELL_SIZE;
 				} else {
 					mouseY = (*p_D2CLIENT_MouseY - CLASSIC_STASH_TOP) / CELL_SIZE;
-					mouseX = (*p_D2CLIENT_MouseX - CLASSIC_STASH_LEFT) / CELL_SIZE;
 				}
 			} else if(pItem->pItemData->ItemLocation == STORAGE_CUBE) {
 				mouseX = (*p_D2CLIENT_MouseX - CUBE_LEFT) / CELL_SIZE;
@@ -359,7 +365,7 @@ void ItemMover::OnLeftClick(bool up, int x, int y, bool* block) {
 						if ((pItem->pItemData->ItemLocation == STORAGE_STASH && !D2CLIENT_GetUIState(UI_STASH)) || (pItem->pItemData->ItemLocation == STORAGE_CUBE && !D2CLIENT_GetUIState(UI_CUBE))) {
 							return;
 						}
-						unidItemId = pItem->dwUnitId;								
+						unidItemId = pItem->dwUnitId;
 					}
 				}
 			}
@@ -394,8 +400,7 @@ void ItemMover::OnRightClick(bool up, int x, int y, bool* block) {
 
 	int inventoryRight = INVENTORY_LEFT + (CELL_SIZE * INVENTORY_WIDTH);
 	int inventoryBottom = INVENTORY_TOP + (CELL_SIZE * INVENTORY_HEIGHT);
-	int stashLeft = xpac ? STASH_LEFT : CLASSIC_STASH_LEFT;
-	int stashRight = stashLeft + (CELL_SIZE * STASH_WIDTH);
+	int stashRight = STASH_LEFT + (CELL_SIZE * STASH_WIDTH);
 	int stashTop = xpac ? LOD_STASH_TOP : CLASSIC_STASH_TOP;
 	int stashHeight = xpac ? LOD_STASH_HEIGHT : CLASSIC_STASH_HEIGHT;
 	int stashBottom = stashTop + (CELL_SIZE * stashHeight);
@@ -410,9 +415,9 @@ void ItemMover::OnRightClick(bool up, int x, int y, bool* block) {
 		source = STORAGE_INVENTORY;
 		sourceX = (x - INVENTORY_LEFT) / CELL_SIZE;
 		sourceY = (y - INVENTORY_TOP) / CELL_SIZE;
-	} else if (stashUI && x >= stashLeft && x <= stashRight && y >= stashTop && y <= stashBottom) {
+	} else if (stashUI && x >= (STASH_LEFT - 2*CELL_SIZE) && x <= stashRight && y >= stashTop && y <= stashBottom) {
 		source = STORAGE_STASH;
-		sourceX = (x - stashLeft) / CELL_SIZE;
+		sourceX = (x - STASH_LEFT + 2*CELL_SIZE) / CELL_SIZE;
 		sourceY = (y - stashTop) / CELL_SIZE;
 	} else if (cubeUI && x >= CUBE_LEFT && x <= cubeRight && y >= CUBE_TOP && y <= cubeBottom) {
 		source = STORAGE_CUBE;
@@ -433,7 +438,6 @@ void ItemMover::LoadConfig() {
 	BH::config->ReadKey("Use TP Tome", "VK_NUMPADADD", TpKey);
 	BH::config->ReadKey("Use Healing Potion", "VK_NUMPADMULTIPLY", HealKey);
 	BH::config->ReadKey("Use Mana Potion", "VK_NUMPADSUBTRACT", ManaKey);
-	BH::config->ReadKey("Use Rejuv Potion", "VK_NUMPADDIVIDE", JuvKey);
 
 	BH::config->ReadInt("Low TP Warning", tp_warn_quantity);
 }
@@ -450,7 +454,6 @@ void ItemMover::OnLoad() {
 	new Drawing::Keyhook(settingsTab, x, (y += 15), &TpKey ,  "Quick Town Portal:     ");
 	new Drawing::Keyhook(settingsTab, x, (y += 15), &HealKey, "Use Healing Potion:    ");
 	new Drawing::Keyhook(settingsTab, x, (y += 15), &ManaKey, "Use Mana Potion:       ");
-	new Drawing::Keyhook(settingsTab, x, (y += 15), &JuvKey,  "Use Rejuv Potion:      ");
 
 	y += 7;
 
@@ -479,9 +482,8 @@ void ItemMover::OnKey(bool up, BYTE key, LPARAM lParam, bool* block)  {
 	if (!unit)
 		return;
 
-	if (!up && (key == HealKey || key == ManaKey || key == JuvKey)) {
-		int idx = key == JuvKey ? 2 : key == ManaKey ? 1 : 0;
-		std::string startChars = POTIONS[idx];
+	if (!up && (key == HealKey || key == ManaKey)) {
+		char firstChar = key == HealKey ? 'h' : 'm';
 		char minPotion = 127;
 		DWORD minItemId = 0;
 		bool isBelt = false;
@@ -489,7 +491,7 @@ void ItemMover::OnKey(bool up, BYTE key, LPARAM lParam, bool* block)  {
 			if (pItem->pItemData->ItemLocation == STORAGE_INVENTORY ||
 				pItem->pItemData->ItemLocation == STORAGE_NULL && pItem->pItemData->NodePage == NODEPAGE_BELTSLOTS) {
 				char* code = D2COMMON_GetItemText(pItem->dwTxtFileNo)->szCode;
-				if (code[0] == startChars[0] && code[1] == startChars[1] && code[2] < minPotion) {
+				if (code[0] == firstChar && code[1] == 'p' && code[2] < minPotion) {
 					minPotion = code[2];
 					minItemId = pItem->dwUnitId;
 					isBelt = pItem->pItemData->NodePage == NODEPAGE_BELTSLOTS;
@@ -745,8 +747,7 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		if (item->ground) {
 			item->x = reader.read(16);
 			item->y = reader.read(16);
-		}
-		else {
+		} else {
 			item->directory = reader.read(4);
 			item->x = reader.read(4);
 			item->y = reader.read(3);
@@ -763,20 +764,17 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 				item->y += 8;
 			}
 			item->container = static_cast<unsigned int>(container);
-		}
-		else if (item->container == CONTAINER_UNSPECIFIED) {
+		} else if (item->container == CONTAINER_UNSPECIFIED) {
 			if (item->directory == EQUIP_NONE) {
 				if (item->inSocket) {
 					//y is ignored for this container type, x tells you the index
 					item->container = CONTAINER_ITEM;
-				}
-				else if (item->action == ITEM_ACTION_PLACE_BELT || item->action == ITEM_ACTION_REMOVE_BELT) {
+				} else if (item->action == ITEM_ACTION_PLACE_BELT || item->action == ITEM_ACTION_REMOVE_BELT) {
 					item->container = CONTAINER_BELT;
 					item->y = item->x / 4;
 					item->x %= 4;
 				}
-			}
-			else {
+			} else {
 				item->unspecifiedDirectory = true;
 			}
 		}
@@ -806,13 +804,7 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		for (std::size_t i = 0; i < 4; i++) {
 			item->code[i] = static_cast<char>(reader.read(8));
 		}
-
-		if (!isalnum(item->code[3])) {
-			item->code[3] = 0;
-		}
-		else {
-			item->code[4] = 0;
-		}
+		item->code[3] = 0;
 
 		if (ItemAttributeMap.find(item->code) == ItemAttributeMap.end()) {
 			HandleUnknownItemCode(item->code, "from packet");
@@ -830,8 +822,7 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 			bool big_pile = reader.readBool();
 			if (big_pile) {
 				item->amount = reader.read(32);
-			}
-			else {
+			} else {
 				item->amount = reader.read(12);
 			}
 			return;
@@ -857,7 +848,7 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 		}
 
 		if (item->identified) {
-			switch (item->quality) {
+			switch(item->quality) {
 			case ITEM_QUALITY_INFERIOR:
 				item->prefix = reader.read(3);
 				break;
@@ -882,10 +873,9 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 				break;
 
 			case ITEM_QUALITY_UNIQUE:
-				if (item->code[0] == 's' && item->code[1] == 't' && item->code[2] == 'd') { //standard of heroes exception
-					break;
+				if (item->code[0] != 's' || item->code[1] != 't' || item->code[2] != 'd') { //standard of heroes exception?
+					item->uniqueCode = reader.read(12);
 				}
-				item->uniqueCode = reader.read(12);
 				break;
 			}
 		}
@@ -926,20 +916,19 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 
 		/*if(entry.throwable)
 		{
-		reader.read(9);
-		reader.read(17);
+			reader.read(9);
+			reader.read(17);
 		} else */
 		//special case: indestructible phase blade
 		if (item->code[0] == '7' && item->code[1] == 'c' && item->code[2] == 'r') {
 			reader.read(8);
-		}
-		else if (item->isArmor || item->isWeapon) {
+		} else if (item->isArmor || item->isWeapon) {
 			item->maxDurability = reader.read(8);
 			item->indestructible = item->maxDurability == 0;
 			/*if (!item->indestructible) {
 				item->durability = reader.read(8);
 				reader.readBool();
-				}*/
+			}*/
 			//D2Hackit always reads it, hmmm. Appears to work.
 			item->durability = reader.read(8);
 			reader.readBool();
@@ -964,33 +953,26 @@ void ParseItem(const unsigned char *data, ItemInfo *item, bool *success) {
 			unsigned long set_mods = reader.read(5);
 		}
 
-		
-		if (strcmp(item->code, "dcbl") == 0 || //pd2 pure demonic essence
-			strcmp(item->code, "dcho") == 0 || //pd2 black soulstone
-			strcmp(item->code, "dcso") == 0) { //pd2 prime evil soul
-			return;
-		}
-
 		while (true) {
 			unsigned long stat_id = reader.read(9);
 			if (stat_id == 0x1ff) {
 				break;
 			}
 			ItemProperty prop = {};
-			/*if (!ProcessStat(stat_id, reader, prop) &&
+			if (!ProcessStat(stat_id, reader, prop) &&
 					!(*BH::MiscToggles2)["Suppress Invalid Stats"].state) {
-				PrintText(1, "Invalid stat: %d, item: %s, data: %s", stat_id, item->code, data);
+				PrintText(1, "Invalid stat: %d, %c%c%c", stat_id, item->code[0], item->code[1], item->code[2]);
 				*success = false;
 				break;
-			}*/
+			}
 			item->properties.push_back(prop);
 		}
 	} catch (int e) {
-		PrintText(1, "Int exception parsing item: %s, %d", item->code, e);
+		PrintText(1, "Int exception parsing item: %c%c%c, %d", item->code[0], item->code[1], item->code[2], e);
 	} catch (std::exception const & ex) {
-		PrintText(1, "Exception parsing item: %s, %s", item->code, ex.what());
+		PrintText(1, "Exception parsing item: %c%c%c, %s", item->code[0], item->code[1], item->code[2], ex.what());
 	} catch(...) {
-		PrintText(1, "Miscellaneous exception parsing item: %s", item->code);
+		PrintText(1, "Miscellaneous exception parsing item: %c%c%c", item->code[0], item->code[1], item->code[2]);
 		*success = false;
 	}
 	return;

@@ -188,11 +188,13 @@ void Maphack::ResetPatches() {
 		infraPatch->Install();
 	else
 		infraPatch->Remove();
-		//GameShake Patch
+
+	//GameShake Patch
 	if (Toggles["Remove Shake"].state)
 		shakePatch->Install();
 	else
 		shakePatch->Remove();
+	
 	//Monster Health Bar Patch
 	if (Toggles["Monster Resistances"].state)
 		monsterNamePatch->Install();
@@ -205,11 +207,13 @@ void Maphack::ResetPatches() {
 	else
 		cpuPatch->Remove();
 
+	// fps patch
 	if (Toggles["Apply FPS Patch"].state)
 		fpsPatch->Install();
 	else
 		fpsPatch->Remove();
 
+	// skip npc quest dialog
 	if (Toggles["Skip NPC Quest Messages"].state) {
 		skipNpcMessages1->Install();
 		skipNpcMessages2->Install();

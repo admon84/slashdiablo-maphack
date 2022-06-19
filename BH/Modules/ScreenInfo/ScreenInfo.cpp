@@ -3,6 +3,7 @@
 #include "../../D2Ptrs.h"
 #include "../../D2Stubs.h"
 #include "../Item/ItemDisplay.h"
+#include "../../MPQReader.h"
 #include "../../D2Version.h"
 #include <time.h>
 
@@ -13,7 +14,7 @@ map<std::string, Toggle> ScreenInfo::Toggles;
 void ScreenInfo::OnLoad() {
 	LoadConfig();
 
-	bhText = new Texthook(OutOfGame, 798, 3, BH_VERSION " (dev/pd2 branch)");
+	bhText = new Texthook(OutOfGame, 798, 3, BH_VERSION);
 	bhText->SetAlignment(Right);
 	bhText->SetColor(Grey);
 
@@ -48,6 +49,11 @@ void ScreenInfo::LoadConfig() {
 			}
 		}
 	}
+}
+
+void ScreenInfo::MpqLoaded() {
+	mpqVersionText = new Texthook(Perm, 5, 589, MpqVersion);
+	mpqVersionText->SetColor(Gold);
 }
 
 void ScreenInfo::OnGameJoin() {
