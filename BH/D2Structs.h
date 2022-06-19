@@ -473,7 +473,7 @@ struct ItemText {
 	wchar_t szName2[0x40];			//0x00
 	union {
 		DWORD dwCode;
-		char szCode[8];
+		char szCode[4];
 	};								//0x40
 	BYTE _uncharted1[0x54];			//0x44
 	DWORD speed;					//0x98
